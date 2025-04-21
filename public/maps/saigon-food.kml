@@ -6540,7 +6540,7 @@
             106.688141,10.7910822,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>406 Hai Bà Trưng, Phường Tân Định, Quận 1, Hồ Chí Minh, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>406 Hai Bà Trưng, Phường Tân Định, Quận 1, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>food</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>The Deck Saigon</name>
         <styleUrl>#icon-seq2-0-11-000000-labelson-nodesc</styleUrl>
@@ -7181,7 +7181,7 @@
             106.7118312,10.7904438,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>85/9 Phạm Viết Chánh, Phường 19, Bình Thạnh, Hồ Chí Minh 700000, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>85/9 Phạm Viết Chánh, Phường 19, Bình Thạnh, Hồ Chí Minh 700000, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>bar</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>YAKITORI HACHIBEI</name>
         <styleUrl>#icon-seq2-0-79-000000-labelson-nodesc</styleUrl>
@@ -7348,23 +7348,23 @@
         </Point>
       <ExtendedData xmlns=""><Data name="address"><value>1 Nguyễn Văn Chiêm, Bến Nghé, Quận 1, Hồ Chí Minh 71006, Vietnam</value></Data><Data name="category"><value>food</value></Data></ExtendedData></Placemark>
       <Placemark>
-        <name><![CDATA[Sunset & Chill Sky Bar]]></name>
+        <name>Sunset &amp; Chill Sky Bar</name>
         <styleUrl>#icon-seq2-0-97-000000-labelson-nodesc</styleUrl>
         <Point>
           <coordinates>
             106.7382083,10.8289255,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>1143 Bình Quới, Phường 28, Bình Thạnh, Hồ Chí Minh, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>1143 Bình Quới, Phường 28, Bình Thạnh, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>bar</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
-        <name><![CDATA[Alibaba Kitchen & Bar]]></name>
+        <name>Alibaba Kitchen &amp; Bar</name>
         <styleUrl>#icon-seq2-0-98-000000-labelson-nodesc</styleUrl>
         <Point>
           <coordinates>
             106.7367032,10.8305927,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>1143 Bình Quới, Phường 28, Bình Thạnh, Hồ Chí Minh 820000, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>1143 Bình Quới, Phường 28, Bình Thạnh, Hồ Chí Minh 820000, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>bar</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>Phở Hòa Pasteur</name>
         <styleUrl>#icon-seq2-0-99-000000-labelson-nodesc</styleUrl>
@@ -7625,7 +7625,7 @@
             106.7054398,10.7822234,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>8/8 Đ. Lê Thánh Tôn, Bến Nghé, Quận 1, Hồ Chí Minh, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>8/8 Đ. Lê Thánh Tôn, Bến Nghé, Quận 1, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>food</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>Bánh Mì Hồng Hoa</name>
         <styleUrl>#icon-seq2-0-127-000000-labelson-nodesc</styleUrl>
@@ -7652,7 +7652,7 @@
             106.7046829,10.7799359,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>8a/h1 Thái Văn Lung, Bến Nghé, Quận 1, Hồ Chí Minh, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>8a/h1 Thái Văn Lung, Bến Nghé, Quận 1, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>food</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>Tokyo Moon Cafe Noir</name>
         <styleUrl>#icon-seq2-0-130-000000-labelson-nodesc</styleUrl>
@@ -7661,7 +7661,7 @@
             106.7049513,10.7795415,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>8A/2C2 Đ. Thái Văn Lung, Bến Nghé, Quận 1, Hồ Chí Minh, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>8A/2C2 Đ. Thái Văn Lung, Bến Nghé, Quận 1, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>cafe</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>Nhà hàng Nhật Bản Fujiro</name>
         <styleUrl>#icon-seq2-0-131-000000-labelson-nodesc</styleUrl>
@@ -7672,14 +7672,14 @@
         </Point>
       <ExtendedData xmlns=""><Data name="address"><value>8a, 8B1 Đ. Thái Văn Lung, Bến Nghé, Quận 1, Hồ Chí Minh, Vietnam</value></Data></ExtendedData></Placemark>
       <Placemark>
-        <name><![CDATA[Pizza 4P's Vo Van Kiet]]></name>
+        <name>Pizza 4P's Vo Van Kiet</name>
         <styleUrl>#icon-seq2-0-132-000000-labelson-nodesc</styleUrl>
         <Point>
           <coordinates>
             106.6876645,10.7551082,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>894/18 Đ. Võ Văn Kiệt, Cầu Kho, Quận 5, Hồ Chí Minh, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>894/18 Đ. Võ Văn Kiệt, Cầu Kho, Quận 5, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>food</value></Data></ExtendedData><description/></Placemark>
     </Folder>
     <Folder>
       <name>Accomm</name>
@@ -7701,7 +7701,7 @@
             106.6959533,10.7808742,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>90 Đ. Nguyễn Thị Minh Khai, Bến Nghé, Quận 3, Hồ Chí Minh 760000, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>90 Đ. Nguyễn Thị Minh Khai, Bến Nghé, Quận 3, Hồ Chí Minh 760000, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>accommodation</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>The Bloom Pham Viet Chanh</name>
         <styleUrl>#icon-seq2-1-2-9C27B0-labelson-nodesc</styleUrl>
@@ -7710,7 +7710,7 @@
             106.7100433,10.7896754,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>40/8/3 Phạm Viết Chánh, Phường 19, Bình Thạnh, Hồ Chí Minh 70000, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>40/8/3 Phạm Viết Chánh, Phường 19, Bình Thạnh, Hồ Chí Minh 70000, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>accommodation</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>CityHouse - City Oasis</name>
         <styleUrl>#icon-seq2-1-3-9C27B0-labelson-nodesc</styleUrl>
@@ -7719,7 +7719,7 @@
             106.6924185,10.7617665,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>42/4 Hồ Hảo Hớn, Phường Cô Giang, Quận 1, Hồ Chí Minh 700000, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>42/4 Hồ Hảo Hớn, Phường Cô Giang, Quận 1, Hồ Chí Minh 700000, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>accommodation</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>The Myst Dong Khoi</name>
         <styleUrl>#icon-seq2-1-4-9C27B0-labelson-nodesc</styleUrl>
@@ -7728,7 +7728,7 @@
             106.7054387,10.7747661,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>39392 Hồ Huấn Nghiệp, Bến Nghé, Quận 1, Hồ Chí Minh, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>39392 Hồ Huấn Nghiệp, Bến Nghé, Quận 1, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>accommodation</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>CityHouse - Atelier Thao Dien</name>
         <styleUrl>#icon-seq2-1-5-9C27B0-labelson-nodesc</styleUrl>
@@ -7737,7 +7737,7 @@
             106.7372114,10.8032426,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>45 Đ. Nguyễn Duy Hiệu, Thảo Điền, Thủ Đức, Hồ Chí Minh 700000, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>45 Đ. Nguyễn Duy Hiệu, Thảo Điền, Thủ Đức, Hồ Chí Minh 700000, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>accommodation</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>Me Saigon Boutique Hotel</name>
         <styleUrl>#icon-seq2-1-6-9C27B0-labelson-nodesc</styleUrl>
@@ -7746,7 +7746,7 @@
             106.6953607,10.7718989,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>280 Đ. Lê Thánh Tôn, Phường Bến Thành, Quận 1, Hồ Chí Minh, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>280 Đ. Lê Thánh Tôn, Phường Bến Thành, Quận 1, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>accommodation</value></Data></ExtendedData><description/></Placemark>
     </Folder>
     <Folder>
       <name>Walking Saigon’s Alleyways</name>
@@ -10151,7 +10151,7 @@
             106.7020771,10.7774368,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>45 Đ. Lê Thánh Tôn, Bến Nghé, Quận 1, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>bar</value></Data></ExtendedData><description/></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>45 Đ. Lê Thánh Tôn, Bến Nghé, Quận 1, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>shopping</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>Converse - 96 Đ. Trần Quang Khải</name>
         <styleUrl>#icon-seq2-9-15-0F9D58-nodesc</styleUrl>
@@ -10160,7 +10160,7 @@
             106.6930212,10.792355,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>96 Đ. Trần Quang Khải, Phường Tân Định, Quận 1, Hồ Chí Minh 71008, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>bar</value></Data></ExtendedData><description/></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>96 Đ. Trần Quang Khải, Phường Tân Định, Quận 1, Hồ Chí Minh 71008, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>shopping</value></Data></ExtendedData><description/></Placemark>
       
       <Placemark>
         <name>Patrick Eyewear</name>
@@ -10170,7 +10170,7 @@
             106.6886367,10.7848112,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>174 Đ. Võ Thị Sáu, Phường Võ Thị Sáu, Quận 3, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>bar</value></Data></ExtendedData><description/></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>174 Đ. Võ Thị Sáu, Phường Võ Thị Sáu, Quận 3, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>shopping</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>Artbook</name>
         <styleUrl>#icon-seq2-9-18-0F9D58-nodesc</styleUrl>
@@ -10188,7 +10188,7 @@
             106.6862896,10.7673055,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>189C Cống Quỳnh, Phường Nguyễn Cư Trinh, Quận 1, Hồ Chí Minh, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>189C Cống Quỳnh, Phường Nguyễn Cư Trinh, Quận 1, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>shopping</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>Saigon Co.op</name>
         <styleUrl>#icon-seq2-9-20-0F9D58-nodesc</styleUrl>
@@ -10197,7 +10197,7 @@
             106.6946098,10.768816,0
           </coordinates>
         </Point>
-      <ExtendedData xmlns=""><Data name="address"><value>199-205 Nguyễn Thái Học, Phường Phạm Ngũ Lão, Quận 1, Hồ Chí Minh, Vietnam</value></Data></ExtendedData></Placemark>
+      <ExtendedData xmlns=""><Data name="address"><value>199-205 Nguyễn Thái Học, Phường Phạm Ngũ Lão, Quận 1, Hồ Chí Minh, Vietnam</value></Data><Data name="phoneNumber"><value/></Data><Data name="descriptionUrl"><value/></Data><Data name="category"><value>shopping</value></Data></ExtendedData><description/></Placemark>
       <Placemark>
         <name>Hãng Đĩa Thời Đại (Times Records)</name>
         <styleUrl>#icon-seq2-9-21-0F9D58-nodesc</styleUrl>

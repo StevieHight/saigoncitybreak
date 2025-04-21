@@ -152,13 +152,14 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-orange-50 py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Experience Saigon?</h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+      <section className="bg-gray-900 py-20 relative">
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h2 className="text-4xl font-bold mb-6 text-white">Ready to Experience Saigon?</h2>
+          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Join our community of travelers and get insider tips for your next adventure in Ho Chi Minh City.
           </p>
-          <button className="bg-orange-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-orange-700 transition-colors">
+          <button className="bg-white text-orange-600 px-8 py-3 rounded-full text-lg font-semibold hover:bg-orange-50 transition-colors">
             Get Started
           </button>
         </div>

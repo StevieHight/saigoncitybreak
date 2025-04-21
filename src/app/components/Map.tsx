@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow, StandaloneSearchBox } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 import { Location } from '../types/location';
 import { loadLocationsFromKML, KMLLocation } from '../utils/kmlParser';
 
@@ -77,7 +77,6 @@ export default function Map({ locations: defaultLocations }: MapProps) {
   });
 
   useEffect(() => {
-    console.log('Google Maps API Key:', process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
     console.log('Is Maps Loaded:', isLoaded);
     console.log('Load Error:', loadError);
   }, [isLoaded, loadError]);
@@ -85,7 +84,6 @@ export default function Map({ locations: defaultLocations }: MapProps) {
   const loadKMLData = useCallback(async () => {
     try {
       const locations = await loadLocationsFromKML();
-      console.log('Refreshed KML locations:', locations);
       setKmlLocations(locations);
     } catch (error) {
       console.error('Error loading KML locations:', error);
@@ -97,11 +95,9 @@ export default function Map({ locations: defaultLocations }: MapProps) {
     if (isLoaded) {
       loadKMLData();
       
-      // Set up polling to refresh KML data every 5 seconds
-      const intervalId = setInterval(loadKMLData, 5000);
-      
-      // Cleanup interval on unmount
-      return () => clearInterval(intervalId);
+      // Only set up polling if real-time updates are needed
+      // const intervalId = setInterval(loadKMLData, 5000);
+      // return () => clearInterval(intervalId);
     }
   }, [isLoaded, loadKMLData]);
 
@@ -205,6 +201,9 @@ export default function Map({ locations: defaultLocations }: MapProps) {
         zoom={13}
         options={options}
         onClick={() => setSelectedLocation(null)}
+        onLoad={map => {
+          mapRef.current = map;
+        }}
       >
         {filteredLocations.map((location, index) => (
           <Marker
