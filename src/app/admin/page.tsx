@@ -28,6 +28,7 @@ export default function AdminPage() {
     address: '',
     phoneNumber: '',
     descriptionUrl: '',
+    blogSlug: undefined,
     coordinates: { lat: 10.7769, lng: 106.7009 }
   });
   const [activeTab, setActiveTab] = useState<'locations' | 'blog'>('locations');
@@ -65,6 +66,7 @@ export default function AdminPage() {
 
   const handleSave = async (updatedLocation: KMLLocation) => {
     try {
+      console.log('Saving location with blog slug:', updatedLocation.blogSlug);
       const response = await fetch('/api/update-location', {
         method: 'POST',
         headers: {
@@ -83,6 +85,21 @@ export default function AdminPage() {
           ? updatedLocation 
           : loc
       ));
+      console.log('Location saved successfully with blog slug:', updatedLocation.blogSlug);
+      
+      // Close the modal after successful save
+      setShowNewLocationForm(false);
+      // Reset the form
+      setNewLocation({
+        name: '',
+        category: 'food',
+        description: '',
+        address: '',
+        phoneNumber: '',
+        descriptionUrl: '',
+        blogSlug: undefined,
+        coordinates: { lat: 10.7769, lng: 106.7009 }
+      });
     } catch (error) {
       console.error('Error saving location:', error);
       alert('Failed to save changes. Please try again.');
@@ -147,6 +164,7 @@ export default function AdminPage() {
 
   const handleAddLocation = async () => {
     try {
+      console.log('Adding location with blog slug:', newLocation.blogSlug);
       const response = await fetch('/api/add-location', {
         method: 'POST',
         headers: {
@@ -156,21 +174,28 @@ export default function AdminPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add location');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add location');
       }
 
-      const addedLocation = await response.json();
-      setLocations([...locations, addedLocation]);
-      setShowNewLocationForm(false);
-      setNewLocation({
-        name: '',
-        category: 'food',
-        description: '',
-        address: '',
-        phoneNumber: '',
-        descriptionUrl: '',
-        coordinates: { lat: 10.7769, lng: 106.7009 }
-      });
+      const { success } = await response.json();
+      if (success) {
+        setLocations([...locations, { ...newLocation }]);
+        console.log('Location added successfully with blog slug:', newLocation.blogSlug);
+        setShowNewLocationForm(false);
+        setNewLocation({
+          name: '',
+          category: 'food',
+          description: '',
+          address: '',
+          phoneNumber: '',
+          descriptionUrl: '',
+          blogSlug: undefined,
+          coordinates: { lat: 10.7769, lng: 106.7009 }
+        });
+      } else {
+        throw new Error('Server returned success: false');
+      }
     } catch (error) {
       console.error('Error adding location:', error);
       alert('Failed to add location. Please try again.');
@@ -188,16 +213,27 @@ export default function AdminPage() {
   };
 
   const filteredAndSortedLocations = locations
-    .filter(location => 
-      (filterCategory === 'all' || location.category === filterCategory) &&
-      (searchTerm === '' || 
-        location.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (location.description && location.description.toLowerCase().includes(searchTerm.toLowerCase())))
-    )
+    .filter(location => {
+      if (!location || !location.name) return false;
+      
+      const matchesCategory = filterCategory === 'all' || location.category === filterCategory;
+      
+      if (!searchTerm) return matchesCategory;
+      
+      const searchTermLower = searchTerm.toLowerCase();
+      const nameMatch = location.name.toLowerCase().includes(searchTermLower);
+      const descriptionMatch = location.description ? 
+        location.description.toLowerCase().includes(searchTermLower) : 
+        false;
+      
+      return matchesCategory && (nameMatch || descriptionMatch);
+    })
     .sort((a, b) => {
       if (sortConfig.key === '') return 0;
+      
       const aVal = a[sortConfig.key];
       const bVal = b[sortConfig.key];
+      
       if (typeof aVal === 'undefined' || typeof bVal === 'undefined') return 0;
       if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -288,6 +324,7 @@ export default function AdminPage() {
             newLocation={newLocation}
             setNewLocation={setNewLocation}
             onAddLocation={handleAddLocation}
+            blogPosts={blogPosts}
           />
         ) : (
           <BlogManager initialPosts={blogPosts} />
@@ -314,7 +351,8 @@ function LocationManager({
   setShowNewLocationForm,
   newLocation,
   setNewLocation,
-  onAddLocation
+  onAddLocation,
+  blogPosts
 }: {
   locations: KMLLocation[];
   onSave: (updatedLocation: KMLLocation) => void;
@@ -333,6 +371,7 @@ function LocationManager({
   newLocation: KMLLocation;
   setNewLocation: React.Dispatch<React.SetStateAction<KMLLocation>>;
   onAddLocation: () => void;
+  blogPosts: BlogPost[];
 }) {
   return (
     <div>
@@ -349,6 +388,13 @@ function LocationManager({
             <option value="cafe">Cafe</option>
             <option value="attraction">Attraction</option>
           </select>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search locations..."
+            className="p-2 border rounded text-black w-64"
+          />
           {selectedLocations.size > 0 && (
             <button
               onClick={onBulkDelete}
@@ -366,11 +412,11 @@ function LocationManager({
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="bg-white rounded-lg shadow">
+        <table className="w-full table-fixed divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-2 py-2">
+              <th className="w-12 px-2 py-2">
                 <input
                   type="checkbox"
                   checked={selectedLocations.size === locations.length}
@@ -384,16 +430,16 @@ function LocationManager({
                   className="rounded border-gray-300 text-indigo-600"
                 />
               </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-1/4 px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Name
               </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-20 px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Category
               </th>
               <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Details
               </th>
-              <th className="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-20 px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -419,56 +465,70 @@ function LocationManager({
                   />
                 </td>
                 <td className="px-2 py-2">
-                  <div className="max-w-full overflow-hidden">
+                  <div className="truncate font-medium text-gray-900">
                     {location.name}
                   </div>
                 </td>
                 <td className="px-2 py-2">
-                  <div className="max-w-full overflow-hidden">
+                  <div className="truncate text-sm text-gray-500">
                     {location.category}
                   </div>
                 </td>
                 <td className="px-2 py-2">
-                  <div className="max-w-full">
-                    <p className="text-sm text-gray-600">{location.description}</p>
+                  <div className="space-y-1">
+                    <p className="text-sm text-gray-600 break-words">{location.description}</p>
                     {location.address && (
-                      <p className="text-sm text-gray-500 mt-1">Address: {location.address}</p>
+                      <p className="text-sm text-gray-500 break-words">
+                        <span className="font-medium">Address:</span> {location.address}
+                      </p>
                     )}
                     {location.phoneNumber && (
-                      <p className="text-sm text-gray-500">Phone: {location.phoneNumber}</p>
+                      <p className="text-sm text-gray-500">
+                        <span className="font-medium">Phone:</span> {location.phoneNumber}
+                      </p>
                     )}
                     {location.rating && (
-                      <p className="text-sm text-gray-500">Rating: {location.rating}</p>
+                      <p className="text-sm text-gray-500">
+                        <span className="font-medium">Rating:</span> {location.rating}
+                      </p>
                     )}
+                    {location.blogSlug && (
+                      <p className="text-sm text-gray-500">
+                        <span className="font-medium">Blog:</span> {location.blogSlug}
+                      </p>
+                    )}
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Coordinates:</span> {location.coordinates.lat.toFixed(4)}, {location.coordinates.lng.toFixed(4)}
+                    </p>
                     {location.descriptionUrl && (
                       <a
                         href={location.descriptionUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800"
+                        className="text-sm text-blue-600 hover:text-blue-800 inline-block"
                       >
-                        More Info
+                        More Info →
                       </a>
                     )}
-                    <p className="text-sm text-gray-500 mt-1">
-                      Lat: {location.coordinates.lat}, Lng: {location.coordinates.lng}
-                    </p>
                   </div>
                 </td>
                 <td className="px-2 py-2 text-right">
-                  <div className="flex justify-end space-x-1">
+                  <div className="flex flex-col gap-1">
                     <button
                       onClick={() => {
-                        setNewLocation(location);
+                        setNewLocation({
+                          ...location,
+                          blogSlug: location.blogSlug || undefined
+                        });
                         setShowNewLocationForm(true);
                       }}
-                      className="bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200 text-sm whitespace-nowrap"
+                      className="bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200 text-sm"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => onDelete(location)}
-                      className="bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200 text-sm whitespace-nowrap"
+                      className="bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200 text-sm"
                     >
                       Delete
                     </button>
@@ -558,6 +618,23 @@ function LocationManager({
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700">Link to Blog Post</label>
+                <select
+                  value={newLocation.blogSlug || ''}
+                  onChange={(e) => setNewLocation({ ...newLocation, blogSlug: e.target.value || undefined })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                >
+                  <option value="">No linked blog post</option>
+                  {[...blogPosts]
+                    .sort((a, b) => a.title.localeCompare(b.title))
+                    .map((post) => (
+                      <option key={post.slug} value={post.slug}>
+                        {post.title}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700">Latitude</label>
                 <input
                   type="number"
@@ -595,6 +672,7 @@ function LocationManager({
                     address: '',
                     phoneNumber: '',
                     descriptionUrl: '',
+                    blogSlug: undefined,
                     coordinates: { lat: 10.7769, lng: 106.7009 }
                   });
                 }}
@@ -603,10 +681,25 @@ function LocationManager({
                 Cancel
               </button>
               <button
-                onClick={onAddLocation}
+                onClick={() => {
+                  if (newLocation.name) {
+                    // If we have coordinates, this is an edit
+                    if (locations.some(loc => 
+                      loc.coordinates.lat === newLocation.coordinates.lat && 
+                      loc.coordinates.lng === newLocation.coordinates.lng
+                    )) {
+                      onSave(newLocation);
+                    } else {
+                      onAddLocation();
+                    }
+                  }
+                }}
                 className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
               >
-                {newLocation.name ? 'Save Changes' : 'Add Location'}
+                {locations.some(loc => 
+                  loc.coordinates.lat === newLocation.coordinates.lat && 
+                  loc.coordinates.lng === newLocation.coordinates.lng
+                ) ? 'Save Changes' : 'Add Location'}
               </button>
             </div>
           </div>

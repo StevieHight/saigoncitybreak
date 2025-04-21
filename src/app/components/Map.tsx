@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 import { loadLocationsFromKML, KMLLocation } from '../utils/kmlParser';
+import Link from 'next/link';
 
 // Function to normalize Vietnamese text by removing diacritics
 const normalizeVietnamese = (str: string): string => {
@@ -215,54 +216,54 @@ export default function Map() {
 
         {selectedLocation && (
           <InfoWindow
-            position={selectedLocation.coordinates}
+            position={{
+              lat: selectedLocation.coordinates.lat,
+              lng: selectedLocation.coordinates.lng
+            }}
             onCloseClick={() => setSelectedLocation(null)}
           >
-            <div className="p-4 bg-white text-black">
-              <div className="mb-4">
-                <div className="text-xl font-medium mb-2">{selectedLocation.name}</div>
-                {selectedLocation.description && (
-                  <div className="mb-2">
-                    {selectedLocation.description.includes('http') ? (
-                      <a 
-                        href={selectedLocation.description}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-700 hover:underline font-normal"
-                      >
-                        View link
-                      </a>
-                    ) : (
-                      <span className="text-black font-normal">{selectedLocation.description}</span>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t pt-4">
-                <div className="text-gray-700 font-medium mb-2">Details from Google Maps</div>
-                <div className="space-y-2">
-                  {selectedLocation.address && (
-                    <div className="text-sm text-black">{selectedLocation.address}</div>
-                  )}
-                  {selectedLocation.phoneNumber && (
-                    <div className="text-sm text-black">{selectedLocation.phoneNumber}</div>
-                  )}
-                  {selectedLocation.rating && (
-                    <div className="text-sm flex items-center">
-                      <span className="text-orange-500 font-medium mr-1">{selectedLocation.rating}</span>
-                      <span className="text-orange-500">★</span>
-                    </div>
-                  )}
+            <div className="max-w-xs">
+              <h3 className="font-semibold text-lg mb-2">{selectedLocation.name}</h3>
+              {selectedLocation.description && (
+                <p className="text-gray-600 text-sm mb-2">{selectedLocation.description}</p>
+              )}
+              {selectedLocation.address && (
+                <p className="text-gray-600 text-sm mb-2">
+                  <strong>Address:</strong> {selectedLocation.address}
+                </p>
+              )}
+              {selectedLocation.phoneNumber && (
+                <p className="text-gray-600 text-sm mb-2">
+                  <strong>Phone:</strong> {selectedLocation.phoneNumber}
+                </p>
+              )}
+              {selectedLocation.rating && (
+                <p className="text-gray-600 text-sm mb-2">
+                  <strong>Rating:</strong> {selectedLocation.rating}/5
+                </p>
+              )}
+              <div className="flex flex-col gap-2 mt-3">
+                {selectedLocation.descriptionUrl && (
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${selectedLocation.coordinates.lat},${selectedLocation.coordinates.lng}`}
+                    href={selectedLocation.descriptionUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-700 hover:underline text-sm block mt-2"
+                    className="text-orange-600 hover:text-orange-700 text-sm"
                   >
-                    View in Google Maps
+                    More Info →
                   </a>
-                </div>
+                )}
+                {selectedLocation.blogSlug && (
+                  <Link
+                    href={`/blog/${selectedLocation.blogSlug}`}
+                    className="text-orange-600 hover:text-orange-700 text-sm flex items-center gap-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
+                    </svg>
+                    Read Blog Post
+                  </Link>
+                )}
               </div>
             </div>
           </InfoWindow>

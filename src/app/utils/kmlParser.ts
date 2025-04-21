@@ -49,6 +49,7 @@ export interface KMLLocation {
     lng: number;
   };
   category: 'food' | 'accommodation' | 'interesting' | 'cafe' | 'bar' | 'shopping';
+  blogSlug?: string;
 }
 
 // Helper function to get address from coordinates using Google Maps Geocoding API
@@ -241,6 +242,11 @@ export async function loadLocationsFromKML(): Promise<KMLLocation[]> {
         category = determineCategory(description.toLowerCase());
       }
 
+      // Get blogSlug from ExtendedData
+      const blogSlugData = nodeListToArray(existingData?.getElementsByTagName('Data') || [])
+        .find(data => data.getAttribute('name') === 'blogSlug');
+      const blogSlug = blogSlugData?.getElementsByTagName('value')[0]?.textContent || undefined;
+
       locations.push({
         name,
         description,
@@ -249,7 +255,8 @@ export async function loadLocationsFromKML(): Promise<KMLLocation[]> {
         rating,
         descriptionUrl,
         coordinates,
-        category
+        category,
+        blogSlug
       });
     }
 

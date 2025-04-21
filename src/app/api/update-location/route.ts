@@ -75,7 +75,8 @@ export async function POST(request: Request) {
             phoneNumber: location.phoneNumber,
             rating: location.rating?.toString(),
             descriptionUrl: location.descriptionUrl,
-            category: location.category // Make sure category is always included
+            category: location.category,
+            blogSlug: location.blogSlug
           };
           
           for (const [key, value] of Object.entries(fields)) {
