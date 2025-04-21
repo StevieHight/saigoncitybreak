@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { loadLocationsFromKML, KMLLocation } from '../utils/kmlParser';
+import { loadLocationsFromKML, KMLLocation } from '@/app/utils/kmlParser';
+import BlogManager from '@/app/components/BlogManager';
+import type { BlogPost } from '@/lib/server/blog';
 
 interface SortConfig {
   key: keyof KMLLocation | '';
@@ -10,7 +12,7 @@ interface SortConfig {
 
 export default function AdminPage() {
   const [locations, setLocations] = useState<KMLLocation[]>([]);
-  const [editingLocation, setEditingLocation] = useState<KMLLocation | null>(null);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
@@ -19,28 +21,41 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: 'asc' });
   const [showNewLocationForm, setShowNewLocationForm] = useState(false);
-  const [newLocation, setNewLocation] = useState<Partial<KMLLocation>>({
+  const [newLocation, setNewLocation] = useState<KMLLocation>({
     name: '',
     category: 'food',
     description: '',
+    address: '',
+    phoneNumber: '',
+    descriptionUrl: '',
     coordinates: { lat: 10.7769, lng: 106.7009 }
   });
+  const [activeTab, setActiveTab] = useState<'locations' | 'blog'>('locations');
 
   useEffect(() => {
-    loadLocationsFromKML()
-      .then(locations => {
-        setLocations(locations);
+    const fetchData = async () => {
+      try {
+        const [locationsData, postsResponse] = await Promise.all([
+          loadLocationsFromKML(),
+          fetch('/api/blog/posts')
+        ]);
+        
+        const postsData = await postsResponse.json();
+        
+        setLocations(locationsData);
+        setBlogPosts(postsData);
         setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error loading locations:', error);
+      } catch (error) {
+        console.error('Error loading data:', error);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple password check - you should use a more secure method in production
     if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
       setAuthenticated(true);
     } else {
@@ -68,7 +83,6 @@ export default function AdminPage() {
           ? updatedLocation 
           : loc
       ));
-      setEditingLocation(null);
     } catch (error) {
       console.error('Error saving location:', error);
       alert('Failed to save changes. Please try again.');
@@ -152,6 +166,9 @@ export default function AdminPage() {
         name: '',
         category: 'food',
         description: '',
+        address: '',
+        phoneNumber: '',
+        descriptionUrl: '',
         coordinates: { lat: 10.7769, lng: 106.7009 }
       });
     } catch (error) {
@@ -191,13 +208,13 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <form onSubmit={handleAuth} className="bg-white p-8 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-6">Admin Login</h2>
+          <h2 className="text-2xl font-bold mb-6 text-black">Admin Login</h2>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter password"
-            className="w-full p-2 border rounded mb-4 text-gray-900"
+            className="w-full p-2 border rounded mb-4 text-black placeholder-gray-500"
           />
           <button
             type="submit"
@@ -223,445 +240,378 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Location Manager</h1>
-          <button
-            onClick={() => setShowNewLocationForm(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          >
-            Add New Location
-          </button>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white p-4 rounded-lg shadow mb-6">
-          <div className="flex gap-4 items-center">
-            <input
-              type="text"
-              placeholder="Search locations..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 p-2 border rounded text-gray-900"
-            />
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value as KMLLocation['category'] | 'all')}
-              className="p-2 border rounded text-gray-900"
+        {/* Navigation Tabs */}
+        <div className="mb-8 border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab('locations')}
+              className={`
+                py-4 px-1 border-b-2 font-medium text-sm
+                ${activeTab === 'locations'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
+              `}
             >
-              <option value="all" className="text-gray-900">All Categories</option>
-              <option value="food" className="text-gray-900">Food</option>
-              <option value="accommodation" className="text-gray-900">Accomm</option>
-              <option value="interesting" className="text-gray-900">Interesting</option>
-              <option value="cafe" className="text-gray-900">Cafes</option>
-              <option value="bar" className="text-gray-900">Bars</option>
-              <option value="shopping" className="text-gray-900">Shopping</option>
-            </select>
-            {selectedLocations.size > 0 && (
-              <div className="flex gap-2">
-                <select
-                  onChange={(e) => {
-                    if (e.target.value && confirm(`Are you sure you want to change the category of ${selectedLocations.size} locations to ${e.target.value}?`)) {
-                      const selectedLocs = locations.filter(loc => 
-                        selectedLocations.has(`${loc.coordinates.lat}-${loc.coordinates.lng}`)
-                      );
-                      
-                      fetch('/api/bulk-update-locations', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                          locations: selectedLocs,
-                          updates: {
-                            category: e.target.value as KMLLocation['category']
-                          }
-                        }),
-                      })
-                      .then(response => response.json())
-                      .then(data => {
-                        if (data.success) {
-                          // Update local state
-                          setLocations(locations.map(loc => 
-                            selectedLocations.has(`${loc.coordinates.lat}-${loc.coordinates.lng}`)
-                              ? { ...loc, category: e.target.value as KMLLocation['category'] }
-                              : loc
-                          ));
-                          setSelectedLocations(new Set());
-                          alert(`Successfully updated ${data.updatedCount} locations`);
-                        } else {
-                          throw new Error(data.error || 'Failed to update locations');
-                        }
-                      })
-                      .catch(error => {
-                        console.error('Error updating locations:', error);
-                        alert('Failed to update locations. Please try again.');
-                      });
-                    }
-                    e.target.value = ''; // Reset select after use
-                  }}
-                  className="p-2 border rounded bg-blue-50 text-blue-600"
-                  value=""
-                >
-                  <option value="">Change Category...</option>
-                  <option value="food">Food</option>
-                  <option value="accommodation">Accomm</option>
-                  <option value="interesting">Interesting</option>
-                  <option value="cafe">Cafes</option>
-                  <option value="bar">Bars</option>
-                  <option value="shopping">Shopping</option>
-                </select>
-                <button
-                  onClick={handleBulkDelete}
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                >
-                  Delete Selected ({selectedLocations.size})
-                </button>
-              </div>
-            )}
-          </div>
+              Locations
+            </button>
+            <button
+              onClick={() => setActiveTab('blog')}
+              className={`
+                py-4 px-1 border-b-2 font-medium text-sm
+                ${activeTab === 'blog'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
+              `}
+            >
+              Blog Posts
+            </button>
+          </nav>
         </div>
-        
-        {/* New Location Form */}
-        {showNewLocationForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-6 max-w-lg w-full">
-              <h2 className="text-xl font-bold mb-4">Add New Location</h2>
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={newLocation.name}
-                  onChange={(e) => setNewLocation({...newLocation, name: e.target.value})}
-                  className="w-full p-2 border rounded"
-                />
-                <select
-                  value={newLocation.category}
-                  onChange={(e) => setNewLocation({...newLocation, category: e.target.value as KMLLocation['category']})}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="food">Food</option>
-                  <option value="accommodation">Accomm</option>
-                  <option value="interesting">Interesting</option>
-                  <option value="cafe">Cafes</option>
-                  <option value="bar">Bars</option>
-                  <option value="shopping">Shopping</option>
-                </select>
-                <input
-                  type="text"
-                  placeholder="Description"
-                  value={newLocation.description}
-                  onChange={(e) => setNewLocation({...newLocation, description: e.target.value})}
-                  className="w-full p-2 border rounded"
-                />
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    placeholder="Latitude"
-                    value={newLocation.coordinates?.lat}
-                    onChange={(e) => setNewLocation({
-                      ...newLocation,
-                      coordinates: { 
-                        lat: parseFloat(e.target.value),
-                        lng: newLocation.coordinates?.lng ?? 106.7009
-                      }
-                    })}
-                    className="w-1/2 p-2 border rounded"
-                    step="any"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Longitude"
-                    value={newLocation.coordinates?.lng}
-                    onChange={(e) => setNewLocation({
-                      ...newLocation,
-                      coordinates: { 
-                        lat: newLocation.coordinates?.lat ?? 10.7769,
-                        lng: parseFloat(e.target.value)
-                      }
-                    })}
-                    className="w-1/2 p-2 border rounded"
-                    step="any"
-                  />
-                </div>
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => setShowNewLocationForm(false)}
-                    className="px-4 py-2 text-gray-600 hover:text-gray-900"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleAddLocation}
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                  >
-                    Add Location
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
-        {/* Locations Table */}
-        <div className="bg-white rounded-lg shadow max-w-full">
-          <table className="w-full table-fixed divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="w-8 px-2 py-2">
+        {/* Content */}
+        {activeTab === 'locations' ? (
+          <LocationManager
+            locations={filteredAndSortedLocations}
+            onSave={handleSave}
+            onDelete={handleDelete}
+            onBulkDelete={handleBulkDelete}
+            selectedLocations={selectedLocations}
+            setSelectedLocations={setSelectedLocations}
+            filterCategory={filterCategory}
+            setFilterCategory={setFilterCategory}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            sortConfig={sortConfig}
+            onSort={handleSort}
+            showNewLocationForm={showNewLocationForm}
+            setShowNewLocationForm={setShowNewLocationForm}
+            newLocation={newLocation}
+            setNewLocation={setNewLocation}
+            onAddLocation={handleAddLocation}
+          />
+        ) : (
+          <BlogManager initialPosts={blogPosts} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function LocationManager({
+  locations,
+  onSave,
+  onDelete,
+  onBulkDelete,
+  selectedLocations,
+  setSelectedLocations,
+  filterCategory,
+  setFilterCategory,
+  searchTerm,
+  setSearchTerm,
+  sortConfig,
+  onSort,
+  showNewLocationForm,
+  setShowNewLocationForm,
+  newLocation,
+  setNewLocation,
+  onAddLocation
+}: {
+  locations: KMLLocation[];
+  onSave: (updatedLocation: KMLLocation) => void;
+  onDelete: (location: KMLLocation) => void;
+  onBulkDelete: () => void;
+  selectedLocations: Set<string>;
+  setSelectedLocations: React.Dispatch<React.SetStateAction<Set<string>>>;
+  filterCategory: KMLLocation['category'] | 'all';
+  setFilterCategory: React.Dispatch<React.SetStateAction<KMLLocation['category'] | 'all'>>;
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  sortConfig: SortConfig;
+  onSort: (key: keyof KMLLocation) => void;
+  showNewLocationForm: boolean;
+  setShowNewLocationForm: React.Dispatch<React.SetStateAction<boolean>>;
+  newLocation: KMLLocation;
+  setNewLocation: React.Dispatch<React.SetStateAction<KMLLocation>>;
+  onAddLocation: () => void;
+}) {
+  return (
+    <div>
+      {/* Location Manager UI */}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center space-x-4">
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value as KMLLocation['category'] | 'all')}
+            className="p-2 border rounded text-black"
+          >
+            <option value="all">All Categories</option>
+            <option value="food">Food</option>
+            <option value="cafe">Cafe</option>
+            <option value="attraction">Attraction</option>
+          </select>
+          {selectedLocations.size > 0 && (
+            <button
+              onClick={onBulkDelete}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+            >
+              Delete Selected ({selectedLocations.size})
+            </button>
+          )}
+        </div>
+        <button
+          onClick={() => setShowNewLocationForm(true)}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          Add Location
+        </button>
+      </div>
+
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-2 py-2">
+                <input
+                  type="checkbox"
+                  checked={selectedLocations.size === locations.length}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedLocations(new Set(locations.map(loc => `${loc.coordinates.lat}-${loc.coordinates.lng}`)));
+                    } else {
+                      setSelectedLocations(new Set());
+                    }
+                  }}
+                  className="rounded border-gray-300 text-indigo-600"
+                />
+              </th>
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Category
+              </th>
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Details
+              </th>
+              <th className="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {locations.map((location) => (
+              <tr key={`${location.coordinates.lat}-${location.coordinates.lng}`} className="hover:bg-gray-50">
+                <td className="px-2 py-2">
                   <input
                     type="checkbox"
-                    checked={selectedLocations.size === locations.length}
+                    checked={selectedLocations.has(`${location.coordinates.lat}-${location.coordinates.lng}`)}
                     onChange={(e) => {
+                      const key = `${location.coordinates.lat}-${location.coordinates.lng}`;
+                      const newSelected = new Set(selectedLocations);
                       if (e.target.checked) {
-                        setSelectedLocations(new Set(locations.map(loc => 
-                          `${loc.coordinates.lat}-${loc.coordinates.lng}`
-                        )));
+                        newSelected.add(key);
                       } else {
-                        setSelectedLocations(new Set());
+                        newSelected.delete(key);
                       }
+                      setSelectedLocations(newSelected);
                     }}
-                    className="rounded border-gray-300"
+                    className="rounded border-gray-300 text-indigo-600"
                   />
-                </th>
-                <th className="w-[15%] px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="w-[12%] px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="w-[58%] px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Details
-                </th>
-                <th className="w-[15%] px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAndSortedLocations.map((location) => (
-                <tr key={`${location.coordinates.lat}-${location.coordinates.lng}`} className="hover:bg-gray-50">
-                  <td className="px-2 py-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedLocations.has(`${location.coordinates.lat}-${location.coordinates.lng}`)}
-                      onChange={(e) => {
-                        const newSelected = new Set(selectedLocations);
-                        if (e.target.checked) {
-                          newSelected.add(`${location.coordinates.lat}-${location.coordinates.lng}`);
-                        } else {
-                          newSelected.delete(`${location.coordinates.lat}-${location.coordinates.lng}`);
-                        }
-                        setSelectedLocations(newSelected);
+                </td>
+                <td className="px-2 py-2">
+                  <div className="max-w-full overflow-hidden">
+                    {location.name}
+                  </div>
+                </td>
+                <td className="px-2 py-2">
+                  <div className="max-w-full overflow-hidden">
+                    {location.category}
+                  </div>
+                </td>
+                <td className="px-2 py-2">
+                  <div className="max-w-full">
+                    <p className="text-sm text-gray-600">{location.description}</p>
+                    {location.address && (
+                      <p className="text-sm text-gray-500 mt-1">Address: {location.address}</p>
+                    )}
+                    {location.phoneNumber && (
+                      <p className="text-sm text-gray-500">Phone: {location.phoneNumber}</p>
+                    )}
+                    {location.rating && (
+                      <p className="text-sm text-gray-500">Rating: {location.rating}</p>
+                    )}
+                    {location.descriptionUrl && (
+                      <a
+                        href={location.descriptionUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        More Info
+                      </a>
+                    )}
+                    <p className="text-sm text-gray-500 mt-1">
+                      Lat: {location.coordinates.lat}, Lng: {location.coordinates.lng}
+                    </p>
+                  </div>
+                </td>
+                <td className="px-2 py-2 text-right">
+                  <div className="flex justify-end space-x-1">
+                    <button
+                      onClick={() => {
+                        setNewLocation(location);
+                        setShowNewLocationForm(true);
                       }}
-                      className="rounded border-gray-300"
-                    />
-                  </td>
-                  <td className="px-2 py-2">
-                    <div className="max-w-full overflow-hidden">
-                      {editingLocation?.coordinates === location.coordinates ? (
-                        <input
-                          type="text"
-                          value={editingLocation.name}
-                          onChange={e => setEditingLocation({
-                            ...editingLocation,
-                            name: e.target.value
-                          })}
-                          className="w-full p-1 border rounded text-gray-900"
-                        />
-                      ) : (
-                        <div className="text-sm font-medium text-gray-900 truncate">{location.name}</div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-2 py-2">
-                    <div className="max-w-full overflow-hidden">
-                      {editingLocation?.coordinates === location.coordinates ? (
-                        <select
-                          value={editingLocation.category}
-                          onChange={e => setEditingLocation({
-                            ...editingLocation,
-                            category: e.target.value as KMLLocation['category']
-                          })}
-                          className="w-full p-1 border rounded text-gray-900"
-                        >
-                          <option value="food">Food</option>
-                          <option value="accommodation">Accomm</option>
-                          <option value="interesting">Interesting</option>
-                          <option value="cafe">Cafes</option>
-                          <option value="bar">Bars</option>
-                          <option value="shopping">Shopping</option>
-                        </select>
-                      ) : (
-                        <div className="text-sm text-gray-900 capitalize truncate">{location.category}</div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-2 py-2">
-                    <div className="max-w-full">
-                      {editingLocation?.coordinates === location.coordinates ? (
-                        <div className="space-y-2">
-                          <textarea
-                            value={editingLocation.description}
-                            onChange={e => setEditingLocation({
-                              ...editingLocation,
-                              description: e.target.value
-                            })}
-                            className="w-full p-1 border rounded text-gray-900"
-                            placeholder="Description"
-                            rows={2}
-                          />
-                          <div className="grid grid-cols-2 gap-2">
-                            <input
-                              type="text"
-                              value={editingLocation.address || ''}
-                              onChange={e => setEditingLocation({
-                                ...editingLocation,
-                                address: e.target.value
-                              })}
-                              className="w-full p-1 border rounded text-gray-900"
-                              placeholder="Address"
-                            />
-                            <input
-                              type="text"
-                              value={editingLocation.phoneNumber || ''}
-                              onChange={e => setEditingLocation({
-                                ...editingLocation,
-                                phoneNumber: e.target.value
-                              })}
-                              className="w-full p-1 border rounded text-gray-900"
-                              placeholder="Phone"
-                            />
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <input
-                              type="number"
-                              value={editingLocation.rating || ''}
-                              onChange={e => setEditingLocation({
-                                ...editingLocation,
-                                rating: parseFloat(e.target.value)
-                              })}
-                              className="w-full p-1 border rounded text-gray-900"
-                              placeholder="Rating"
-                              step="0.1"
-                              min="0"
-                              max="5"
-                            />
-                            <input
-                              type="text"
-                              value={editingLocation.descriptionUrl || ''}
-                              onChange={e => setEditingLocation({
-                                ...editingLocation,
-                                descriptionUrl: e.target.value
-                              })}
-                              className="w-full p-1 border rounded text-gray-900"
-                              placeholder="URL"
-                            />
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <input
-                              type="number"
-                              value={editingLocation.coordinates.lat}
-                              onChange={e => setEditingLocation({
-                                ...editingLocation,
-                                coordinates: {
-                                  ...editingLocation.coordinates,
-                                  lat: parseFloat(e.target.value)
-                                }
-                              })}
-                              className="w-full p-1 border rounded text-gray-900"
-                              placeholder="Lat"
-                              step="any"
-                            />
-                            <input
-                              type="number"
-                              value={editingLocation.coordinates.lng}
-                              onChange={e => setEditingLocation({
-                                ...editingLocation,
-                                coordinates: {
-                                  ...editingLocation.coordinates,
-                                  lng: parseFloat(e.target.value)
-                                }
-                              })}
-                              className="w-full p-1 border rounded text-gray-900"
-                              placeholder="Lng"
-                              step="any"
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-1 text-sm">
-                          <div className="text-gray-900 break-all line-clamp-2 hover:line-clamp-none">
-                            {location.description || location.descriptionUrl}
-                          </div>
-                          <div className="flex flex-wrap gap-2 text-gray-600">
-                            {location.address && (
-                              <div className="inline-flex items-start break-all">
-                                <span className="mr-1 flex-shrink-0">📍</span>
-                                <span className="break-all">{location.address}</span>
-                              </div>
-                            )}
-                            {location.phoneNumber && (
-                              <div className="inline-flex items-center">
-                                <span className="mr-1 flex-shrink-0">📞</span>
-                                <span>{location.phoneNumber}</span>
-                              </div>
-                            )}
-                            {location.rating && (
-                              <div className="inline-flex items-center">
-                                <span className="mr-1 flex-shrink-0">⭐</span>
-                                <span>{location.rating}</span>
-                              </div>
-                            )}
-                            <div className="inline-flex items-center text-gray-500">
-                              <span className="mr-1 flex-shrink-0">📌</span>
-                              <span>{location.coordinates.lat.toFixed(4)}, {location.coordinates.lng.toFixed(4)}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-2 py-2 text-right">
-                    <div className="flex justify-end space-x-1">
-                      {editingLocation?.coordinates === location.coordinates ? (
-                        <>
-                          <button
-                            onClick={() => handleSave(editingLocation)}
-                            className="bg-green-100 text-green-600 px-2 py-1 rounded hover:bg-green-200 text-sm whitespace-nowrap"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={() => setEditingLocation(null)}
-                            className="bg-gray-100 text-gray-600 px-2 py-1 rounded hover:bg-gray-200 text-sm whitespace-nowrap"
-                          >
-                            Cancel
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => setEditingLocation(location)}
-                            className="bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200 text-sm whitespace-nowrap"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(location)}
-                            className="bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200 text-sm whitespace-nowrap"
-                          >
-                            Delete
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      className="bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200 text-sm whitespace-nowrap"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => onDelete(location)}
+                      className="bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200 text-sm whitespace-nowrap"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+
+      {/* New Location Form */}
+      {showNewLocationForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-medium mb-4">
+              {newLocation.name ? 'Edit Location' : 'Add New Location'}
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Name</label>
+                <input
+                  type="text"
+                  value={newLocation.name}
+                  onChange={(e) => setNewLocation({ ...newLocation, name: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Category</label>
+                <select
+                  value={newLocation.category}
+                  onChange={(e) => setNewLocation({ ...newLocation, category: e.target.value as KMLLocation['category'] })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                >
+                  <option value="food">Food</option>
+                  <option value="cafe">Cafe</option>
+                  <option value="attraction">Attraction</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <textarea
+                  value={newLocation.description}
+                  onChange={(e) => setNewLocation({ ...newLocation, description: e.target.value })}
+                  rows={3}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Address</label>
+                <input
+                  type="text"
+                  value={newLocation.address || ''}
+                  onChange={(e) => setNewLocation({ ...newLocation, address: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+                <input
+                  type="text"
+                  value={newLocation.phoneNumber || ''}
+                  onChange={(e) => setNewLocation({ ...newLocation, phoneNumber: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Rating</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  value={newLocation.rating || ''}
+                  onChange={(e) => setNewLocation({ ...newLocation, rating: parseFloat(e.target.value) })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Description URL</label>
+                <input
+                  type="url"
+                  value={newLocation.descriptionUrl || ''}
+                  onChange={(e) => setNewLocation({ ...newLocation, descriptionUrl: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Latitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  value={newLocation.coordinates.lat}
+                  onChange={(e) => setNewLocation({
+                    ...newLocation,
+                    coordinates: { ...newLocation.coordinates, lat: parseFloat(e.target.value) }
+                  })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Longitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  value={newLocation.coordinates.lng}
+                  onChange={(e) => setNewLocation({
+                    ...newLocation,
+                    coordinates: { ...newLocation.coordinates, lng: parseFloat(e.target.value) }
+                  })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowNewLocationForm(false);
+                  setNewLocation({
+                    name: '',
+                    category: 'food',
+                    description: '',
+                    address: '',
+                    phoneNumber: '',
+                    descriptionUrl: '',
+                    coordinates: { lat: 10.7769, lng: 106.7009 }
+                  });
+                }}
+                className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={onAddLocation}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              >
+                {newLocation.name ? 'Save Changes' : 'Add Location'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
