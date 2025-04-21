@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
-import { Location } from '../types/location';
 import { loadLocationsFromKML, KMLLocation } from '../utils/kmlParser';
 
 // Function to normalize Vietnamese text by removing diacritics
@@ -11,10 +10,6 @@ const normalizeVietnamese = (str: string): string => {
     .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
     .replace(/[đĐ]/g, d => d === 'đ' ? 'd' : 'D'); // Replace Vietnamese 'd'
 };
-
-interface MapProps {
-  locations: Location[];
-}
 
 const mapContainerStyle = {
   width: '100%',
@@ -62,7 +57,7 @@ const categoryLabels = {
   shopping: 'Shopping',
 };
 
-export default function Map({ locations: defaultLocations }: MapProps) {
+export default function Map() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedLocation, setSelectedLocation] = useState<KMLLocation | null>(null);
   const [kmlLocations, setKmlLocations] = useState<KMLLocation[]>([]);
@@ -94,15 +89,12 @@ export default function Map({ locations: defaultLocations }: MapProps) {
   useEffect(() => {
     if (isLoaded) {
       loadKMLData();
-      
-      // Only set up polling if real-time updates are needed
-      // const intervalId = setInterval(loadKMLData, 5000);
-      // return () => clearInterval(intervalId);
     }
   }, [isLoaded, loadKMLData]);
 
   const filteredLocations = kmlLocations.filter(location => {
     const matchesCategory = selectedCategory === 'all' || location.category === selectedCategory;
+    
     const normalizedQuery = normalizeVietnamese(searchQuery.toLowerCase());
     const normalizedName = normalizeVietnamese(location.name.toLowerCase());
     const normalizedDescription = location.description ? normalizeVietnamese(location.description.toLowerCase()) : '';
